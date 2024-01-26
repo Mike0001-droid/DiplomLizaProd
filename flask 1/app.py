@@ -1,7 +1,7 @@
 import sqlite3, os
 from flask import Flask, render_template, request, url_for, flash, redirect, g
 from DataBase import DataBase
-from flask_login import LoginManager, login_user, login_required
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from UserLogin import UserLogin
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -43,7 +43,6 @@ def get_db():
     return g.link_db
 
 
-
 @app.route("/")
 def index():
         path = url_for('static', filename='img/robot.jpg')
@@ -52,9 +51,8 @@ def index():
         path3 = url_for('static', filename='php/sender.php')
         return render_template('index.html', posts=dbase.getJSON(), path=path, path1=path1, path2=path2, path3=path3)
 
-
-@login_required
 @app.route("/update_status", methods= ["POST", "GET"])
+@login_required
 def updateStatus():
     if request.method == "POST":
         res = dbase.updateStatus(request.form['title'], request.form['content'], request.form['status'], request.form['id'])
@@ -67,8 +65,8 @@ def updateStatus():
     return render_template('admin.html', menu=dbase.getJSON())
 
 
-@login_required
 @app.route("/add_post", methods= ["POST", "GET"])
+@login_required
 def addPost():
     if request.method == "POST":
         res = dbase.addPost(request.form['title'], request.form['content'])
@@ -79,18 +77,16 @@ def addPost():
         
     return render_template('add_post.html', menu=dbase.getMenu(), title="Добавление статьи")
 
-
-
-@app.route('/register', methods=['POST', 'GET'])
-def register():
-    if request.method == "POST":
-        if request.form['psw'] == request.form['psw2']:
-            hash = generate_password_hash(request.form['psw'])
-            res = dbase.addUser(request.form['name'], request.form['email'], hash)
-            if res:
-                return redirect(url_for('login'))
-    return render_template('register.html', menu=dbase.getMenu())
-
+if current_user.get_admin() == 1:
+    @app.route('/register', methods=['POST', 'GET'])
+    def register():
+        if request.method == "POST":
+            if request.form['psw'] == request.form['psw2']:
+                hash = generate_password_hash(request.form['psw'])
+                res = dbase.addUser(request.form['name'], request.form['email'], hash)
+                if res:
+                    return redirect(url_for('login'))
+        return render_template('register.html', menu=dbase.getMenu())
 
 
 @app.route('/login', methods=['POST', 'GET'])
@@ -100,13 +96,27 @@ def login():
         if user and check_password_hash(user['psw'], request.form['psw']):
             userLogin = UserLogin().create(user)
             login_user(userLogin)
-            return redirect(url_for('index'))           
+            return redirect(url_for('profile'))           
     return render_template("login.html", menu=dbase.getMenu())
 
 
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
 
+
+@app.route('/profile')
+@login_required
+def profile():
+    return f"""<p><a href="{url_for('logout')}"> Выйти из профиля</a>
+               <p> user info: {current_user.get_id()} 
+               <p> admin: {current_user.get_admin()}
 """ 
-@app.route('/successfulauth', methods=['GET', 'POST'])
+
+
+""" @app.route('/successfulauth', methods=['GET', 'POST'])
 def successfulauth():
         conn = connect_db()
         cursor_db = conn.cursor()
@@ -123,8 +133,9 @@ def successfulauth():
 def contact():
          if request.method == 'POST':
                 print(request.form)
-                return render_template('contact.html', title = "обратная")
+                return render_template('contact.html', title = "обратная")  """
+
+         
 if __name__ == "__main__":
-    app.run(debug=True) """
-if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True) 
+

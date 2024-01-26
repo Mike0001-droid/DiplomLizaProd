@@ -70,7 +70,7 @@ class DataBase:
                 print("Пользователь с таким email уже существует")
                 return False
             
-            self.__cur.execute("INSERT INTO users VALUES(NULL, ?, ?, ?)", (name, email, hpsw))
+            self.__cur.execute("INSERT INTO users VALUES(NULL, ?, ?, ?, ?)", (name, email, hpsw, 1))
             self.__db.commit()
         except sqlite3.Error as e:
             print("Ошибка добавления пользователя в БД "+str(e))
