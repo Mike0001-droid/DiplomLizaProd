@@ -1,4 +1,4 @@
-import math, time, sqlite3
+import math, time, sqlite3, datetime
 class DataBase:
     def __init__(self, db):
         self.__db = db
@@ -30,10 +30,12 @@ class DataBase:
         return []
     
     
-    def addPost(self, title, content):
+    def addPost(self, title, content, user):
         try:
-            tm = math.floor(time.time())
-            self.__cur.execute("INSERT INTO posts VALUES(NULL, ?, ?, ?, ?)", (tm, title, content, 'draft'))
+            today = datetime.datetime.today()
+            tm = today.strftime("%d/%m/%Y")
+
+            self.__cur.execute("INSERT INTO posts VALUES(NULL, ?, ?, ?, ?, ?)", (tm, title, content, 'draft', user))
             self.__db.commit()
         except sqlite3.Error as e:
             print("Ошибка добавления статьи в БД" + str(e))
@@ -49,7 +51,7 @@ class DataBase:
             return False
         return True
     
-            
+
     def getPost(self, postId):
         try:
             self.__cur.execute(f"SELECT title, content FROM posts WHERE id = {postId} LIMIT 1")
@@ -69,13 +71,11 @@ class DataBase:
             if res['count'] > 0:
                 print("Пользователь с таким email уже существует")
                 return False
-            
-            self.__cur.execute("INSERT INTO users VALUES(NULL, ?, ?, ?, ?)", (name, email, hpsw, 1))
+            self.__cur.execute("INSERT INTO users VALUES(NULL, ?, ?, ?, ?)", (name, email, hpsw, 0))
             self.__db.commit()
         except sqlite3.Error as e:
             print("Ошибка добавления пользователя в БД "+str(e))
             return False
-        
         return True
 
     def getUser(self, user_id):
@@ -101,5 +101,16 @@ class DataBase:
             return res 
         except sqlite3.Error as e:
             print("Ошибка получения данных из БД "+str(e))
-
         return False
+    
+    def getUserPostsJSON(self, userId):
+        try:
+            self.__cur.execute(f"SELECT created, title, content, status FROM posts WHERE author = {userId} ")
+            res = self.__cur.fetchall()
+            if res:
+                blocks_list = [dict(ix) for ix in res]
+                return blocks_list
+        except sqlite3.Error as e:
+            print(e)
+            return False
+        return (False, False)

@@ -22,7 +22,6 @@ def before_request():
 login_manager = LoginManager(app)
 @login_manager.user_loader #Загрузка пользователя 
 def load_user(user_id):
-    print("load_user")
     return UserLogin().fromDB(user_id, dbase)
 
 def connect_db():
@@ -45,31 +44,39 @@ def get_db():
 
 @app.route("/")
 def index():
-        path = url_for('static', filename='img/robot.jpg')
-        path1 = url_for('static', filename='img/ruk.jpg')
-        path2 = url_for('static', filename='img/robot2.jpg')
-        path3 = url_for('static', filename='php/sender.php')
-        return render_template('index.html', posts=dbase.getJSON(), path=path, path1=path1, path2=path2, path3=path3)
+    path = url_for('static', filename='img/robot.jpg')
+    path1 = url_for('static', filename='img/ruk.jpg')
+    path2 = url_for('static', filename='img/robot2.jpg')
+    path3 = url_for('static', filename='php/sender.php')
+    return render_template('index.html', posts=dbase.getJSON(), path=path, path1=path1, path2=path2, path3=path3)
 
 @app.route("/update_status", methods= ["POST", "GET"])
 @login_required
 def updateStatus():
-    if request.method == "POST":
-        res = dbase.updateStatus(request.form['title'], request.form['content'], request.form['status'], request.form['id'])
-        if not res:
-            flash('Ошибка обновления статуса', category= 'error')
+    tmp = None
+    menu = None
+    if int(current_user.get_admin()) == 1:
+        tmp = 'admin.html'
+        menu = dbase.getJSON()
+        if request.method == "POST":
+            res = dbase.updateStatus(request.form['title'], request.form['content'], request.form['status'], request.form['id'])
+            if not res:
+                flash('Ошибка обновления статуса', category= 'error')
+            else:
+                flash('Статус успешно обновлен', category='success')
         else:
-            flash('Статус успешно обновлен', category='success')
+            flash('Ошибка обновления статуса', category='error')
     else:
-        flash('Ошибка обновления статуса', category='error')
-    return render_template('admin.html', menu=dbase.getJSON())
+        tmp = 'error_admin.html'
+    print(tmp)
+    return render_template(tmp, menu=menu)
 
 
 @app.route("/add_post", methods= ["POST", "GET"])
 @login_required
 def addPost():
     if request.method == "POST":
-        res = dbase.addPost(request.form['title'], request.form['content'])
+        res = dbase.addPost(request.form['title'], request.form['content'], current_user.get_id())
         if not res:
             flash('Ошибка добавления статьи', category= 'error')
         else:
@@ -77,16 +84,16 @@ def addPost():
         
     return render_template('add_post.html', menu=dbase.getMenu(), title="Добавление статьи")
 
-if current_user.get_admin() == 1:
-    @app.route('/register', methods=['POST', 'GET'])
-    def register():
-        if request.method == "POST":
-            if request.form['psw'] == request.form['psw2']:
-                hash = generate_password_hash(request.form['psw'])
-                res = dbase.addUser(request.form['name'], request.form['email'], hash)
-                if res:
-                    return redirect(url_for('login'))
-        return render_template('register.html', menu=dbase.getMenu())
+
+@app.route('/register', methods=['POST', 'GET'])
+def register():
+    if request.method == "POST":
+        if request.form['psw'] == request.form['psw2']:
+            hash = generate_password_hash(request.form['psw'])
+            res = dbase.addUser(request.form['name'], request.form['email'], hash)
+            if res:
+                return redirect(url_for('login'))
+    return render_template('register.html', menu=dbase.getMenu())
 
 
 @app.route('/login', methods=['POST', 'GET'])
@@ -96,7 +103,9 @@ def login():
         if user and check_password_hash(user['psw'], request.form['psw']):
             userLogin = UserLogin().create(user)
             login_user(userLogin)
-            return redirect(url_for('profile'))           
+            return redirect(url_for('profile')) 
+        elif not user:
+            flash('Пользователь не найден', category='error')      
     return render_template("login.html", menu=dbase.getMenu())
 
 
@@ -110,31 +119,12 @@ def logout():
 @app.route('/profile')
 @login_required
 def profile():
-    return f"""<p><a href="{url_for('logout')}"> Выйти из профиля</a>
-               <p> user info: {current_user.get_id()} 
-               <p> admin: {current_user.get_admin()}
-""" 
-
-
-""" @app.route('/successfulauth', methods=['GET', 'POST'])
-def successfulauth():
-        conn = connect_db()
-        cursor_db = conn.cursor()
-        posts = conn.execute('SELECT * FROM user').fetchall()
-        id = cursor_db.execute("SELECT fio FROM user where login = ?", (LOG, )).fetchone()[0]
-        gruppa = cursor_db.execute("SELECT gruppa FROM user where login = ?", (LOG, )).fetchone()[0]
-        
-        cursor_db.close()
-        conn.close()
-        return render_template('successfulauth.html', LOG=LOG, id=id,gruppa=gruppa,posts=posts)
-
-
-@app.route("/contact", methods=["POST","GET"])
-def contact():
-         if request.method == 'POST':
-                print(request.form)
-                return render_template('contact.html', title = "обратная")  """
-
+    data = None
+    if int(current_user.get_admin()) == 1:
+        data = dbase.getJSON()
+    else:
+        data = dbase.getUserPostsJSON(current_user.get_id())
+    return render_template("admin_panel.html", posts=data, user=current_user.get_name())
          
 if __name__ == "__main__":
     app.run(debug=True) 

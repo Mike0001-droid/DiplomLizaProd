@@ -213,6 +213,14 @@ details {
     background-color: #464444;
   }
 
-  
+.flash {padding: 10px;}
+.flash.success {
+    border: 1px solid #21db56;
+    background: #AEFFC5
+}
+.flash.error {
+    border: 1px solid #ff4343;
+    background: #FF9C9C;
+}
 
 

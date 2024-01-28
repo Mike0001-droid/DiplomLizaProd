@@ -4,7 +4,8 @@ CREATE TABLE posts (
     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     title TEXT NOT NULL,
     content TEXT NOT NULL,
-    status TEXT DEFAULT draft
+    status TEXT DEFAULT draft,
+    author TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS users (

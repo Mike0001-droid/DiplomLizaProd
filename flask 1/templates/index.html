@@ -8,14 +8,14 @@
 <div class="dropdown">
     <button onclick="myFunction()" class="dropbtn"> ...</button>
     <div id="myDropdown" class="dropdown-content">
-        <a href="#masedam">Главная</a>
-        <a href="#naszabuv">Проекты</a>
+        <a href="{{ url_for('index') }}">Главная</a>
+        <a href="{{ url_for('profile') }}">Профиль</a>
         <a href="#kirasib">Новости</a>
         <a href="#agmod">Технологии</a>
       <a href="#">Контакты</a>
     </div>
-  </div>
-  <script>
+</div>
+<script>
     /* Когда пользователь нажимает на кнопку, переключаться раскрывает содержимое */
     function myFunction() {
       document.getElementById("myDropdown").classList.toggle("show");
@@ -33,7 +33,7 @@
         }
       }
     }
-    </script>
+</script>
     
 
 <ul>
@@ -65,15 +65,15 @@
 <div class="proj">
     <div class="pram">
         {% for post in posts %} 
-        {% if post["status"] == 'public' %}
-    <div class ="child"><p class="Z">{{ post['title'] }}
-        <p>{{ post['created'] }}
-        <p>{{ post['content'] }}
-        <p class="Z">{{ post['autor'] }}
- </div>
-        {% endif %}
- {% endfor %}
- </div>
+          {% if post["status"] == 'public' %}
+          <div class ="child"><p class="Z">{{ post['title'] }}
+              <p>{{ post['created'] }}
+              <p>{{ post['content'] }}
+              <p class="Z">{{ post['autor'] }}
+          </div>
+          {% endif %}
+        {% endfor %}
+    </div>
 </div>
  
  <div class="about" >
