@@ -64,11 +64,8 @@ def updateStatus():
                 flash('Ошибка обновления статуса', category= 'error')
             else:
                 flash('Статус успешно обновлен', category='success')
-        else:
-            flash('Ошибка обновления статуса', category='error')
     else:
         tmp = 'error_admin.html'
-    print(tmp)
     return render_template(tmp, menu=menu)
 
 
@@ -76,7 +73,12 @@ def updateStatus():
 @login_required
 def addPost():
     if request.method == "POST":
-        res = dbase.addPost(request.form['title'], request.form['content'], current_user.get_id())
+        res = None
+        if int(current_user.get_admin()) == 1:
+            res = dbase.addPost(request.form['title'], request.form['content'], current_user.get_id(), 'public')
+        else:
+            res = dbase.addPost(request.form['title'], request.form['content'], current_user.get_id(), 'draft')
+
         if not res:
             flash('Ошибка добавления статьи', category= 'error')
         else:
@@ -86,8 +88,9 @@ def addPost():
 
 
 @app.route('/register', methods=['POST', 'GET'])
+@login_required
 def register():
-    if request.method == "POST":
+    if request.method == "POST" and int(current_user.get_admin()) == 1:
         if request.form['psw'] == request.form['psw2']:
             hash = generate_password_hash(request.form['psw'])
             res = dbase.addUser(request.form['name'], request.form['email'], hash)
@@ -116,16 +119,45 @@ def logout():
     return redirect(url_for('login'))
 
 
-@app.route('/profile')
+@app.route('/profile', methods= ["POST", "GET"])
 @login_required
 def profile():
     data = None
     if int(current_user.get_admin()) == 1:
         data = dbase.getJSON()
+        if request.method == "POST":
+            print(request.form)
+            res = dbase.updateStatus(request.form['title'], request.form['content'], request.form['status'], request.form['id'])
+            if not res:
+                flash('Ошибка обновления статуса', category= 'error')
+            else:
+                flash('Статус успешно обновлен', category='success')
     else:
         data = dbase.getUserPostsJSON(current_user.get_id())
-    return render_template("admin_panel.html", posts=data, user=current_user.get_name())
-         
+    return render_template(
+        "admin_panel.html", 
+        posts=data, 
+        user_name=current_user.get_name(),
+        is_admin=current_user.get_admin())
+
+""" @app.route("/update_status", methods= ["POST", "GET"])
+@login_required
+def updateStatus():
+    tmp = None
+    menu = None
+    if int(current_user.get_admin()) == 1:
+        tmp = 'admin.html'
+        menu = dbase.getJSON()
+        if request.method == "POST":
+            res = dbase.updateStatus(request.form['title'], request.form['content'], request.form['status'], request.form['id'])
+            if not res:
+                flash('Ошибка обновления статуса', category= 'error')
+            else:
+                flash('Статус успешно обновлен', category='success')
+    else:
+        tmp = 'error_admin.html'
+    return render_template(tmp, menu=menu) """
+
 if __name__ == "__main__":
     app.run(debug=True) 
 

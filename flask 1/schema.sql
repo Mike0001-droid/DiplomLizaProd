@@ -13,5 +13,17 @@ CREATE TABLE IF NOT EXISTS users (
     name TEXT NOT NULL,
     email TEXT NOT NULL,
     psw TEXT NOT NULL,
-    is_admin INTEGER DEFAULT 1
+    is_admin INTEGER NOT NULL
+);
+
+CREATE TABLE news (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    content TEXT NOT NULL,
+    img BLOB DEFAULT NULL
+);
+
+CREATE TABLE technologies (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    summary TEXT NOT NULL,
+    content TEXT NOT NULL
 );

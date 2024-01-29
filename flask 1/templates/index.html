@@ -10,9 +10,9 @@
     <div id="myDropdown" class="dropdown-content">
         <a href="{{ url_for('index') }}">Главная</a>
         <a href="{{ url_for('profile') }}">Профиль</a>
-        <a href="#kirasib">Новости</a>
-        <a href="#agmod">Технологии</a>
-      <a href="#">Контакты</a>
+        <a href="{{ url_for('addPost') }}">Добавить статью</a>
+        <a href="{{ url_for('updateStatus') }}">Редактировать статьи</a>
+        <a href="#">Контакты</a>
     </div>
 </div>
 <script>
@@ -82,20 +82,20 @@
 
 <div class="about" id="kirasib">
     Технологии
- </div>
- {% for tecn in tecnol %} 
+</div>
+{% for tecn in tecnol %} 
  <div class="technolog">
-     <div class="perTech">
+   <div class="perTech">
      <div class ="childTech">
-        <details>
-            <summary>{{ tecn['name'] }}</summary>
-            <p>{{ tecn['content'] }}</p>
-          </details>
-  </div>
-  
-  </div>
+       <details>
+           <summary>{{ tecn['name'] }}</summary>
+           <p>{{ tecn['content'] }}</p>
+       </details>
+     </div> 
+   </div>
  </div>
-  {% endfor %}
+{% endfor %}
+
 <hr>
 <div class="Im">
     <img src="{{ path1 }}"/> 

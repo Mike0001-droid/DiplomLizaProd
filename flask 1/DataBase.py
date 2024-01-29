@@ -30,17 +30,26 @@ class DataBase:
         return []
     
     
-    def addPost(self, title, content, user):
+    def addPost(self, title, content, user, status):
         try:
             today = datetime.datetime.today()
             tm = today.strftime("%d/%m/%Y")
 
-            self.__cur.execute("INSERT INTO posts VALUES(NULL, ?, ?, ?, ?, ?)", (tm, title, content, 'draft', user))
+            self.__cur.execute("INSERT INTO posts VALUES(NULL, ?, ?, ?, ?, ?)", (tm, title, content, status, user))
             self.__db.commit()
         except sqlite3.Error as e:
             print("Ошибка добавления статьи в БД" + str(e))
             return False
         return True
+    
+    """ def addTech(self, summary, content):
+        try:
+            self.__cur.execute("INSERT INTO technologies VALUES(NULL, ?, ?, ?, ?, ?)", (summary, content))
+            self.__db.commit()
+        except sqlite3.Error as e:
+            print("Ошибка добавления технологии в БД" + str(e))
+            return False
+        return True """
     
     def updateStatus(self, title, content, status, id):
         try:

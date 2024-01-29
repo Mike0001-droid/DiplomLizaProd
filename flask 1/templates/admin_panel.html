@@ -61,16 +61,39 @@
 			<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
 				<h1 class="h2">Добро пожаловать!</h1>
 			</div>
-			<div class="d-flex align-items-start">
-				<p>Данные пока отсутвуют или их не получилось получить из БД</p>
-			</div>
-
-
+			{% for cat, msg in get_flashed_messages(True) %}
+				<div class="flash {{cat}}">{{msg}}</div>
+			{% endfor %}
+			{% for post in posts %}
+				{% if is_admin == 1 %}
+				<div class="card mb-3">
+					<div class="card-body">
+						<h5 class="card-title">{{ post['title'] }}</h5>
+						<p class="card-text">{{ post['content'] }}</p>
+						<p class="card-text"><small class="text-muted">{{ post['created'] }}</small></p>
+					</div>
+				</div>
+				{% else %}
+				
+				<form action="{{url_for('profile')}}" method="post" class="form-contact">
+					<div class="card mb-3">
+						<div class="card-body">
+							<label class="d-flex flex-column">Заголовок<input class="form-control" type="text" value="{{ post['title'] }}" name="title"> <br></label>
+							<label class="d-flex flex-column">Контент<textarea class="form-control" value="{{ post['content'] }}" name="content" rows="8" cols="55"> {{ post['content'] }}</textarea> <br></label>
+							<p>Статус: {{ post['status'] }}</p>
+							<label class="d-flex gap-3 align-items-center">Изменить статус?<input id='testName' type='checkbox' value='public' name='status'></label>
+							<label class="d-flex gap-3 align-items-center"><input id='testNameHidden' type='hidden' value='draft' name='status'></label>
+							<input class="form-control" type="hidden" name="id" value="{{ post['id'] }}">
+							<p><button class="form-control color-primary btn btn-primary" type="submit">Изменить</button>
+						</div>
+					</div>
+				</form>
+				
+				{% endif %}
+			{% endfor %}
 		</main>
 	</div>
 </div>
-
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
