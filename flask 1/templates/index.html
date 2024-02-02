@@ -1,122 +1,121 @@
 {% extends 'base.html' %}
- 
+
 {% block content %}
-{{ super() }}
-<link type="text/css" href="{{ url_for('static', filename='css/style1.css')}}" rel="stylesheet" />
+    {{ super() }}
+    <link type="text/css" href="{{ url_for('static', filename='css/style1.css') }}" rel="stylesheet"/>
+
+    <div class="wrapper">
+
+        <script>
+            /* Когда пользователь нажимает на кнопку, переключаться раскрывает содержимое */
+            function myFunction() {
+                document.getElementById("myDropdown").classList.toggle("show");
+            }
+
+            // Закрыть раскрывающийся список, если пользователь щелкнет за его пределами.
+            window.onclick = function (event) {
+                if (!event.target.matches('.dropbtn')) {
+                    var dropdowns = document.getElementsByClassName("dropdown-content");
+                    var i;
+                    for (i = 0; i < dropdowns.length; i++) {
+                        var openDropdown = dropdowns[i];
+                        if (openDropdown.classList.contains('show')) {
+                            openDropdown.classList.remove('show');
+                        }
+                    }
+                }
+            }
+        </script>
 
 
-<div class="dropdown">
-    <button onclick="myFunction()" class="dropbtn"> ...</button>
-    <div id="myDropdown" class="dropdown-content">
-        <a href="{{ url_for('index') }}">Главная</a>
-        <a href="{{ url_for('profile') }}">Профиль</a>
-        <a href="{{ url_for('addPost') }}">Добавить статью</a>
-        <a href="{{ url_for('updateStatus') }}">Редактировать статьи</a>
-        <a href="#">Контакты</a>
-    </div>
-</div>
-<script>
-    /* Когда пользователь нажимает на кнопку, переключаться раскрывает содержимое */
-    function myFunction() {
-      document.getElementById("myDropdown").classList.toggle("show");
-    }
-    // Закрыть раскрывающийся список, если пользователь щелкнет за его пределами.
-    window.onclick = function(event) {
-      if (!event.target.matches('.dropbtn')) {
-        var dropdowns = document.getElementsByClassName("dropdown-content");
-        var i;
-        for (i = 0; i < dropdowns.length; i++) {
-          var openDropdown = dropdowns[i];
-          if (openDropdown.classList.contains('show')) {
-            openDropdown.classList.remove('show');
-          }
-        }
-      }
-    }
-</script>
-    
-
-<ul>
-    <li class="kolunoesig-lankaned" id=""></li>
-    <li class="kolunoesig-lankaned" id=""></li>
-    <li class="kolunoesig-lankaned" id=""></li>
-    <li class="kolunoesig-lankaned" id=""></li>
-    <li class="kolunoesig-lankaned" id=""></li>
-</ul>
-
-
-<div class="container"  id="masedam">
-    <img src="{{ path }}" align="left">
-    <div class="bottom-left"> <span>Лаборатория</span><br><div class="bottom-l">искусственного</div><br>интеллекта</div>
-  </div>
-
-<div class="about" id="dev">
-    О нас   
-</div>
-
-<div class ="txt">
-    Создана в 2022 году для выработки ответов на большие вызовы фундаментальной науки и индустрии, связанные с автоматизацией обработки данных и обеспечением информационной безопасности, реализации Национальной стратегии развития искусственного интеллекта
-    </div>
-<div class="about" id="naszabuv">
-        Проекты
+        <ul>
+            <li class="kolunoesig-lankaned" id=""></li>
+            <li class="kolunoesig-lankaned" id=""></li>
+            <li class="kolunoesig-lankaned" id=""></li>
+            <li class="kolunoesig-lankaned" id=""></li>
+            <li class="kolunoesig-lankaned" id=""></li>
+        </ul>
+        <div class="home__cover content" id="masedam">
+            <img class="home__cover--image" src="{{ path }}" align="left">
+            <div class="bottom-left"><span>Лаборатория</span><br>
+                <div class="bottom-l">искусственного</div>
+                <br>интеллекта
+            </div>
         </div>
-   
-       
-<div class="proj">
-    <div class="pram">
-        {% for post in posts %} 
-          {% if post["status"] == 'public' %}
-          <div class ="child"><p class="Z">{{ post['title'] }}
-              <p>{{ post['created'] }}
-              <p>{{ post['content'] }}
-              <p class="Z">{{ post['autor'] }}
-          </div>
-          {% endif %}
-        {% endfor %}
+        <div class="content mt-5">
+            <div class="about" id="dev">
+                О нас
+            </div>
+            <div class="txt">
+                Создана в 2022 году для выработки ответов на большие вызовы фундаментальной науки и индустрии,
+                связанные
+                с
+                автоматизацией обработки данных и обеспечением информационной безопасности, реализации Национальной
+                стратегии
+                развития искусственного интеллекта
+            </div>
+            <div class="about" id="naszabuv">
+                Проекты
+            </div>
+            <div class="proj">
+                <div class="pram">
+                    {% for post in posts %}
+                        {% if post["status"] == 'public' %}
+                            <div class="child"><p class="Z">{{ post['title'] }}
+                                <p>{{ post['created'] }}
+                                <p>{{ post['content'] }}
+                                <p class="Z">{{ post['autor'] }}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="about" id="news">
+                Новости
+            </div>
+            <div class="about" id="kirasib">
+                Технологии
+            </div>
+            {% for tecn in tecnol %}
+                <div class="technolog">
+                    <div class="perTech">
+                        <div class="childTech">
+                            <details>
+                                <summary>{{ tecn['summary'] }}</summary>
+                                <p>{{ tecn['content'] }}</p>
+                            </details>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            <hr>
+
+            <div class="imcontent d-flex justify-content-between">
+                <div class="Im">
+                    <img src="{{ path1 }}"/>
+                </div>
+                <div class="tx">
+                    Руководитель лаборатории<br>Шарапов Артем Андреевич</p>
+                </div>
+            </div>
+        </div>
+
+
+        <hr>
+        <div class="content position-relative">
+            <div class="Im2">
+                <img src="{{ path2 }}">
+            </div>
+            <form class="form__feedback" action="{{ path3 }}" method="post" id="form__feedback">
+                <h3 class="form__feedback--h">Написать нам</h3>
+                <input class="form__feedback--input" type="text" name="name" placeholder="Имя" required>
+                <input class="form__feedback--input" type="email" name="email" placeholder="Email" required>
+                <textarea class="form__feedback--input" name="text" id="" rows="2"
+                          placeholder="Введите текст"></textarea>
+                <button type="button" class="form__feedback--btn">Отправить форму</button>
+                <div class="status"></div>
+
+            </form>
+        </div>
     </div>
-</div>
- 
- <div class="about" >
-   Новости
-</div>
-
-<div class="about" id="kirasib">
-    Технологии
-</div>
-{% for tecn in tecnol %} 
- <div class="technolog">
-   <div class="perTech">
-     <div class ="childTech">
-       <details>
-           <summary>{{ tecn['name'] }}</summary>
-           <p>{{ tecn['content'] }}</p>
-       </details>
-     </div> 
-   </div>
- </div>
-{% endfor %}
-
-<hr>
-<div class="Im">
-    <img src="{{ path1 }}"/> 
-</div>
-<div class="tx">
-    Руководитель лаборатории<br>Шарапов Артем Андреевич</p>
-</div>
-<div class="clear"></div>
-
-<hr>
-<div class="Im2">
-    <img src="{{ path2 }}" align="left">
-</div>
-<form action="{{ path3 }}" method="post">
-  <div class="form-inner">
-  <h3>Написать нам</h3>
-  <input type="text" class="name" name="name" placeholder="Имя" required>
-  <input type="email" name="email" placeholder="Email" required>
-  <textarea name="text" id=""  rows="2" placeholder="Введите текст"></textarea>
-  <button type="button" class="send-form">Отправить форму</button>
-  <div class="status"></div>
-  </div>
-</form>
 {% endblock %}

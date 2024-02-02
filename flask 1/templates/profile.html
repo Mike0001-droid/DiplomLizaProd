@@ -1,13 +1,19 @@
-<div class="proj">
-    <div class="pram">
-        {% for post in posts %} 
-          {% if post["status"] == 'public' %}
-          <div class ="child"><p class="Z">{{ post['title'] }}
-              <p>{{ post['created'] }}
-              <p>{{ post['content'] }}
-              <p class="Z">{{ post['autor'] }}
-          </div>
-          {% endif %}
-        {% endfor %}
+{% extends 'base.html' %}
+
+
+{% block content %}
+    {{ super() }}
+    <div class="proj">
+        <div class="pram">
+            {% for post in posts %}
+                {% if post["status"] == 'public' %}
+                    <div class="child"><p class="Z">{{ post['title'] }}
+                        <p>{{ post['created'] }}
+                        <p>{{ post['content'] }}
+                        <p class="Z">{{ post['autor'] }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
     </div>
-</div>
+{% endblock %}

@@ -8,6 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 DATABASE = '/tmp/database.db'
 DEBUG = True
 SECRET_KEY = 'gadsgsf123&81230><asd,'
+MAX_CONTENT_LENGTH = 1024*1024
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config.update(dict(DATABASE=os.path.join(app.root_path, 'database.db')))
@@ -48,7 +49,23 @@ def index():
     path1 = url_for('static', filename='img/ruk.jpg')
     path2 = url_for('static', filename='img/robot2.jpg')
     path3 = url_for('static', filename='php/sender.php')
-    return render_template('index.html', posts=dbase.getJSON(), path=path, path1=path1, path2=path2, path3=path3)
+    is_admin = None
+    if str(current_user.is_authenticated)!='False':
+        is_admin = int(current_user.get_admin())
+    else:
+        is_admin = None
+
+    return render_template(
+        'index.html',
+        tecnol=dbase.getTechnJSON(),
+        posts=dbase.getJSON(),
+        path=path,
+        path1=path1,
+        path2=path2,
+        path3=path3,
+        auth_user=str(current_user.is_authenticated),
+        is_admin=is_admin
+    )
 
 @app.route("/update_status", methods= ["POST", "GET"])
 @login_required
@@ -78,25 +95,40 @@ def addPost():
             res = dbase.addPost(request.form['title'], request.form['content'], current_user.get_id(), 'public')
         else:
             res = dbase.addPost(request.form['title'], request.form['content'], current_user.get_id(), 'draft')
-
         if not res:
             flash('Ошибка добавления статьи', category= 'error')
         else:
             flash('Статья добавлена успешно', category='success')
-        
+    return render_template('add_post.html', menu=dbase.getMenu(), title="Добавление статьи")
+
+
+@app.route("/add_tech", methods= ["POST", "GET"])
+@login_required
+def addTech():
+    if request.method == "POST" and int(current_user.get_admin()) == 1:
+        res = dbase.addTech(request.form['summary'], request.form['content'])
+        if not res:
+            flash('Ошибка добавления статьи', category= 'error')
+        else:
+            flash('Статья добавлена успешно', category='success')
     return render_template('add_post.html', menu=dbase.getMenu(), title="Добавление статьи")
 
 
 @app.route('/register', methods=['POST', 'GET'])
 @login_required
 def register():
+    tmp = None
     if request.method == "POST" and int(current_user.get_admin()) == 1:
         if request.form['psw'] == request.form['psw2']:
             hash = generate_password_hash(request.form['psw'])
             res = dbase.addUser(request.form['name'], request.form['email'], hash)
             if res:
+                tmp = 'register.html'
                 return redirect(url_for('login'))
-    return render_template('register.html', menu=dbase.getMenu())
+    else:
+        tmp = 'error_admin.html'
+
+    return render_template(tmp)
 
 
 @app.route('/login', methods=['POST', 'GET'])
@@ -116,8 +148,7 @@ def login():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('login'))
-
+    return redirect(url_for('index'))
 
 @app.route('/profile', methods= ["POST", "GET"])
 @login_required
@@ -126,7 +157,6 @@ def profile():
     if int(current_user.get_admin()) == 1:
         data = dbase.getJSON()
         if request.method == "POST":
-            print(request.form)
             res = dbase.updateStatus(request.form['title'], request.form['content'], request.form['status'], request.form['id'])
             if not res:
                 flash('Ошибка обновления статуса', category= 'error')
@@ -134,29 +164,21 @@ def profile():
                 flash('Статус успешно обновлен', category='success')
     else:
         data = dbase.getUserPostsJSON(current_user.get_id())
+    
     return render_template(
         "admin_panel.html", 
         posts=data, 
         user_name=current_user.get_name(),
-        is_admin=current_user.get_admin())
+        is_admin=int(current_user.get_admin()))
 
-""" @app.route("/update_status", methods= ["POST", "GET"])
-@login_required
-def updateStatus():
-    tmp = None
-    menu = None
-    if int(current_user.get_admin()) == 1:
-        tmp = 'admin.html'
-        menu = dbase.getJSON()
-        if request.method == "POST":
-            res = dbase.updateStatus(request.form['title'], request.form['content'], request.form['status'], request.form['id'])
-            if not res:
-                flash('Ошибка обновления статуса', category= 'error')
-            else:
-                flash('Статус успешно обновлен', category='success')
-    else:
-        tmp = 'error_admin.html'
-    return render_template(tmp, menu=menu) """
+""" @app.route('/image')
+def image():
+    img = current_user.getAvatar(app)
+    if not img:
+        return ""
+    h = make_response(img)
+    h.headers['Content-Type'] = 'image/png'
+    return h """
 
 if __name__ == "__main__":
     app.run(debug=True) 

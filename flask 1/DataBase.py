@@ -28,7 +28,21 @@ class DataBase:
             #print ('Ошибка чтения из бд')
             return False
         return []
-    
+
+    def getTechnJSON(self):
+        sql = '''SELECT * FROM technologies'''
+        try:
+            self.__cur.execute(sql)
+            res = self.__cur.fetchall()
+            if res:
+                blocks_list = [dict(ix) for ix in res]
+                return blocks_list
+        except:
+            #print ('Ошибка чтения из бд')
+            return False
+        return []
+
+
     
     def addPost(self, title, content, user, status):
         try:
@@ -42,14 +56,15 @@ class DataBase:
             return False
         return True
     
-    """ def addTech(self, summary, content):
+    def addTech(self, summary, content):
         try:
-            self.__cur.execute("INSERT INTO technologies VALUES(NULL, ?, ?, ?, ?, ?)", (summary, content))
+            self.__cur.execute("INSERT INTO technologies VALUES(NULL, ?, ?)", (summary, content))
             self.__db.commit()
         except sqlite3.Error as e:
             print("Ошибка добавления технологии в БД" + str(e))
             return False
-        return True """
+        return True
+
     
     def updateStatus(self, title, content, status, id):
         try:
@@ -72,6 +87,18 @@ class DataBase:
             return False
         return (False, False)
     
+
+    """ def getImage(self, postId):
+        try:
+            self.__cur.execute(f"SELECT title, content FROM posts WHERE id = {postId} LIMIT 1")
+            res = self.__cur.fetchone()
+            if res:
+                return res
+        except sqlite3.Error as e:
+            #print("Ошибка получения статьи из БД "+str(e))
+            return False
+        return (False, False) """
+ 
     
     def addUser(self, name, email, hpsw):
         try:
@@ -122,4 +149,4 @@ class DataBase:
         except sqlite3.Error as e:
             print(e)
             return False
-        return (False, False)
+        return ()
