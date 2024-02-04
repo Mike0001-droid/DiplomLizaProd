@@ -75,6 +75,15 @@ class DataBase:
             return False
         return True
     
+    def updateTechn(self, title, content, id):
+        try:
+            self.__cur.execute(f"UPDATE technologies SET summary=?, content=? WHERE id=?", (title, content, id))
+            self.__db.commit()
+        except sqlite3.Error as e:
+            print("Ошибка обновления технологии в БД: " + str(e))
+            return False
+        return True
+    
 
     def getPost(self, postId):
         try:

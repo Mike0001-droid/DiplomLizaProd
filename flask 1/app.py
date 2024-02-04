@@ -102,18 +102,6 @@ def addPost():
     return render_template('add_post.html', menu=dbase.getMenu(), title="Добавление статьи")
 
 
-@app.route("/add_tech", methods= ["POST", "GET"])
-@login_required
-def addTech():
-    if request.method == "POST" and int(current_user.get_admin()) == 1:
-        res = dbase.addTech(request.form['summary'], request.form['content'])
-        if not res:
-            flash('Ошибка добавления статьи', category= 'error')
-        else:
-            flash('Статья добавлена успешно', category='success')
-    return render_template('add_post.html', menu=dbase.getMenu(), title="Добавление статьи")
-
-
 @app.route('/register', methods=['POST', 'GET'])
 @login_required
 def register():
@@ -138,7 +126,8 @@ def login():
         if user and check_password_hash(user['psw'], request.form['psw']):
             userLogin = UserLogin().create(user)
             login_user(userLogin)
-            return redirect(url_for('profile')) 
+            return redirect(url_for('post_admin')) 
+        
         elif not user:
             flash('Пользователь не найден', category='error')      
     return render_template("login.html", menu=dbase.getMenu())
@@ -150,9 +139,9 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
-@app.route('/profile', methods= ["POST", "GET"])
+@app.route('/post_admin', methods= ["POST", "GET"])
 @login_required
-def profile():
+def post_admin():
     data = None
     if int(current_user.get_admin()) == 1:
         data = dbase.getJSON()
@@ -166,10 +155,43 @@ def profile():
         data = dbase.getUserPostsJSON(current_user.get_id())
     
     return render_template(
-        "admin_panel.html", 
+        "post_admin.html", 
         posts=data, 
         user_name=current_user.get_name(),
-        is_admin=int(current_user.get_admin()))
+        is_admin=int(current_user.get_admin())
+    )
+
+
+@app.route("/tech_admin", methods= ["POST", "GET"])
+@login_required
+def tech_admin():
+    if request.method == "POST" :
+        res = dbase.updateTechn(request.form['summary'], request.form['content'], request.form['id'])
+        if not res:
+            flash('Ошибка добавления статьи', category= 'error')
+        else:
+            flash('Статья добавлена успешно', category='success')
+    return render_template(
+        'technol_admin.html',  
+        posts= dbase.getTechnJSON(), 
+        user_name=current_user.get_name(),
+        is_admin=int(current_user.get_admin())
+    )
+
+
+@app.route("/add_tech", methods= ["POST", "GET"])
+@login_required
+def addTech():
+    if request.method == "POST":
+        res = None
+        if int(current_user.get_admin()) == 1:
+            res = dbase.addTech(request.form['summary'], request.form['content'])
+        if not res:
+            flash('Ошибка добавления статьи', category= 'error')
+        else:
+            flash('Статья добавлена успешно', category='success')
+    return render_template('add_tech.html', menu=dbase.getMenu(), title="Добавление статьи")
+
 
 """ @app.route('/image')
 def image():
@@ -183,3 +205,13 @@ def image():
 if __name__ == "__main__":
     app.run(debug=True) 
 
+""" 
+1) Посмотреть обновление на изменении статуса 
+2) Добавить возможность удаления/добавления пользователей
+3) Закончить с новостями 
+4) Обратный запрос 
+
+5) Адаптив
+6) Деплой 
+
+"""

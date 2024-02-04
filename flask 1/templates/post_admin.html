@@ -50,7 +50,7 @@
 				<div class="position-sticky pt-3">
 					<ul class="nav flex-column">
 						<li class="nav-item">
-							<a class="nav-link active" aria-current="page" href="{{ url_for('index') }}">
+							<a class="nav-link active" aria-current="page" href="{{ url_for('tech_admin') }}">
 								<span data-feather="home"></span>
 								Технологии
 							</a>
@@ -81,7 +81,7 @@
             {% else %}
 				{% for post in posts %}
 					{% if is_admin == 1 %}
-						<form action="{{url_for('profile')}}" method="post" class="form-contact">
+						<form action="{{url_for('post_admin')}}" method="post" class="form-contact">
 							<div class="card mb-3">
 								<div class="card-body">
 									<label class="d-flex flex-column">Заголовок<input class="form-control" type="text" value="{{ post['title'] }}" name="title"> <br></label>

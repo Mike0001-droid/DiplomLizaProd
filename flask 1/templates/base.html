@@ -14,7 +14,7 @@
     {% if auth_user == 'False' %}
         <a href="{{ url_for('login') }}">Войти</a>
     {% else %}
-        <a href="{{ url_for('profile') }}">Профиль</a>
+        <a href="{{ url_for('post_admin') }}">Профиль</a>
     {% endif %}
     
 </div>
