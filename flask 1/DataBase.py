@@ -1,4 +1,4 @@
-import math, time, sqlite3, datetime
+import  sqlite3, datetime
 class DataBase:
     def __init__(self, db):
         self.__db = db
@@ -144,6 +144,19 @@ class DataBase:
                 return False
             
             return res 
+        except sqlite3.Error as e:
+            print("Ошибка получения данных из БД "+str(e))
+        return False
+    
+
+    def getAllUsers(self):
+        try:
+            self.__cur.execute(f"SELECT * FROM users")
+            res = self.__cur.fetchall()
+            if res:
+                blocks_list = [dict(ix) for ix in res]
+                return blocks_list
+            
         except sqlite3.Error as e:
             print("Ошибка получения данных из БД "+str(e))
         return False

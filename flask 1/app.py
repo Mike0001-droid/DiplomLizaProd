@@ -105,18 +105,13 @@ def addPost():
 @app.route('/register', methods=['POST', 'GET'])
 @login_required
 def register():
-    tmp = None
-    if request.method == "POST" and int(current_user.get_admin()) == 1:
+    if request.method == "POST":
         if request.form['psw'] == request.form['psw2']:
             hash = generate_password_hash(request.form['psw'])
             res = dbase.addUser(request.form['name'], request.form['email'], hash)
             if res:
-                tmp = 'register.html'
                 return redirect(url_for('login'))
-    else:
-        tmp = 'error_admin.html'
-
-    return render_template(tmp)
+    return render_template('register.html', is_admin=int(current_user.get_admin()))
 
 
 @app.route('/login', methods=['POST', 'GET'])
@@ -153,10 +148,12 @@ def post_admin():
                 flash('Статус успешно обновлен', category='success')
     else:
         data = dbase.getUserPostsJSON(current_user.get_id())
-    
+    res = dbase.getAllUsers()
+
     return render_template(
         "post_admin.html", 
         posts=data, 
+        res= res,
         user_name=current_user.get_name(),
         is_admin=int(current_user.get_admin())
     )
@@ -191,6 +188,21 @@ def addTech():
         else:
             flash('Статья добавлена успешно', category='success')
     return render_template('add_tech.html', menu=dbase.getMenu(), title="Добавление статьи")
+
+
+@app.route("/get_all_users")
+@login_required
+def get_all_users():
+
+    res = dbase.getAllUsers()
+ 
+    return render_template(
+        'all_users.html', 
+        data=res, 
+        user_name=current_user.get_name(),
+        is_admin=int(current_user.get_admin())
+    )
+
 
 
 """ @app.route('/image')

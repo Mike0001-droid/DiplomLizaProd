@@ -35,13 +35,14 @@
 	<div class="container-fluid">
 		<a class="navbar-brand" href="#"></a>
 		<div class="d-flex align-items-center">
+			
 			<span class="me-3">Привет, {{user_name}}</span>
             <a href="{{ url_for('index') }}" class="btn btn-outline-secondary me-4">Главная</a>
 			{% if is_admin == 1 %}
 				<a class="btn btn-outline-secondary me-4" href="{{url_for('register')}}">Добавить пользователя</a>
 			{% else %}
 			{% endif %}
-			<a class="btn btn-outline-secondary me-4" href="{{url_for('addTech')}}">Добавить технологию</a>
+			<a class="btn btn-outline-secondary me-4" href="{{url_for('addPost')}}">Добавить статью</a>
 			<a href="{{ url_for('logout') }}" class="btn btn-outline-secondary">Выход</a>
 		</div>
 	</div>
@@ -67,7 +68,7 @@
 								<span data-feather="home"></span>
 								Статьи
 							</a>	
-							<a class="nav-link active" aria-current="page" href="{{ url_for('get_all_users') }}">
+                            <a class="nav-link active" aria-current="page" href="{{ url_for('get_all_users') }}">
 								<span data-feather="home"></span>
 								Пользователи
 							</a>
@@ -82,34 +83,18 @@
 			<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
 				<h1 class="h2">Добро пожаловать!</h1>
 			</div>
-			{% for cat, msg in get_flashed_messages(True) %}
-				<div class="flash {{cat}}">{{msg}}</div>
-			{% endfor %}
-			{% if posts == () %}
-                <h5 class="card-title">Технологий пока нету</h5>
-            {% else %}
-				{% for post in posts %}
-					{% if is_admin == 1 %}
-						<form action="{{url_for('tech_admin')}}" method="post" class="form-contact">
-							<div class="card mb-3">
-								<div class="card-body">
-									<label class="d-flex flex-column">Заголовок<input class="form-control" type="text" value="{{ post['summary'] }}" name="summary"> <br></label>
-									<label class="d-flex flex-column">Контент<textarea class="form-control" value="{{ post['content'] }}" name="content" rows="8" cols="55"> {{ post['content'] }}</textarea> <br></label>
-									<input class="form-control" type="hidden" name="id" value="{{ post['id'] }}">
-									<p><button class="form-control color-primary btn btn-primary" type="submit">Изменить</button>
-								</div>
-							</div>
-						</form>
-					{% else %}
-						<div class="card mb-3">
-							<div class="card-body">
-								<h5 class="card-title">{{ post['summary'] }}</h5>
-								<p class="card-text">{{ post['content'] }}</p>
-								<p class="card-text"><small class="text-muted">{{ post['created'] }}</small></p>
-							</div>
-						</div>
-					{% endif %}
-				{% endfor %}
+			{% if is_admin == 1 %}
+            <div class="row">
+                {% for user in data %}
+                <div class="card" style="width: 18rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">Имя: {{user['name']}}</h5>
+                        <h5 class="card-title">Почта: {{user['email']}}</h5>
+                        <h5 class="card-title">Пароль: пароль хэш</h5>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
 			{% endif %}
 		</main>
 	</div>
