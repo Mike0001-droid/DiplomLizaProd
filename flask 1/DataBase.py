@@ -202,10 +202,8 @@ class DataBase:
                 f"SELECT img FROM news WHERE id = {newId} LIMIT 1")
             res = self.__cur.fetchone()
             if not res:
-
                 print("Запись не найдена")
                 return False
-
             return dict(res)
         except sqlite3.Error as e:
             print(e)

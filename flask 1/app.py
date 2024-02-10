@@ -157,11 +157,13 @@ def post_admin():
         data = dbase.getJSON()
         if request.method == "POST":
             res = dbase.updateStatus(
-                request.form['title'], request.form['content'], request.form['status'], request.form['id'])
-            if not res:
-                flash('Ошибка обновления статуса', category='error')
-            else:
-                flash('Статус успешно обновлен', category='success')
+                request.form['title'], 
+                request.form['content'], 
+                request.form['status'], 
+                request.form['id']
+            )
+            return redirect(url_for('post_admin'))
+            
     else:
         data = dbase.getUserPostsJSON(current_user.get_id())
 
@@ -226,8 +228,7 @@ def get_all_users():
 @login_required
 def get_img(new_id):
     obj = dbase.getImageNewJSON(new_id)
-    print(type(obj))
-    h = make_response(obj)
+    h = make_response(obj['img'])
     return h
 
 
@@ -243,7 +244,8 @@ def news_admin():
                 res = dbase.updateNewImg(img, request.form['id'])
                 if not res:
                     print("Ошибка добавления")
-                print("Картинка добавлена")
+                return redirect(url_for('news_admin'))
+
             except FileNotFoundError as e:
                 print("Ошибка чтения файла")
         else:
@@ -262,9 +264,6 @@ if __name__ == "__main__":
     app.run(debug=True)
 
 """ 
-1) Посмотреть обновление на изменении статуса 
-2) Добавить возможность удаления/добавления пользователей
-3) Закончить с новостями 
 4) Обратный запрос 
 
 5) Адаптив
