@@ -104,10 +104,10 @@
                 {% else %}
                 {% for post in posts %}
 
-                <form action="{{url_for('news_admin')}}" method="POST" , enctype="multipart/form-data">
+                <form action="{{url_for('updateNew')}}" method="POST" , enctype="multipart/form-data">
                     <div class="card mb-3">
                         <div class="card-body">
-                            <div class="profile-ava"><img src="{{url_for('get_img', new_id=post['id'] )}}"></div>
+                            <img src=".{{ post['img'] }}" style="width: 762x; height: 459px; object-fit: cover;">
                             <label class="d-flex flex-column">Заголовок<input class="form-control" type="text"
                                     value="{{ post['summary'] }}" name="summary"> <br></label>
                             <label class="d-flex flex-column">Контент<textarea class="form-control"
@@ -115,10 +115,9 @@
                                     cols="55"> {{ post['content'] }}</textarea> <br></label>
                             <label class="d-flex gap-3 align-items-center"><input id='statusHidden' type='hidden'
                                     value='draft' name='status'></label>
-                            <p><input type="file" name="file">
+                            <p><input type="file" name="img">
                                 <input class="form-control" type="hidden" name="id" value="{{ post['id'] }}">
-
-                            <p><input type="submit" value="{{ post['id'] }} Загрузить">
+                            <p><input type="submit" value="Загрузить">
                         </div>
                     </div>
                 </form>

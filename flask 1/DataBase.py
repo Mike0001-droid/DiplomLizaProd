@@ -67,6 +67,17 @@ class DataBase:
             print("Ошибка добавления технологии в БД" + str(e))
             return False
         return True
+    
+    def addNew(self, content, img):
+        try:
+            self.__cur.execute(
+                "INSERT INTO news VALUES(NULL, ?, ?)", (content, img))
+            self.__db.commit()
+        except sqlite3.Error as e:
+            print("Ошибка добавления новости в БД" + str(e))
+            return False
+        return True
+    
 
     def updateStatus(self, title, content, status, id):
         try:
@@ -82,6 +93,16 @@ class DataBase:
         try:
             self.__cur.execute(
                 f"UPDATE technologies SET summary=?, content=? WHERE id=?", (title, content, id))
+            self.__db.commit()
+        except sqlite3.Error as e:
+            print("Ошибка обновления технологии в БД: " + str(e))
+            return False
+        return True
+    
+    def updateNew(self, content, img, id):
+        try:
+            self.__cur.execute(
+                f"UPDATE news SET content=?, img=? WHERE id=?", (content, img, id))
             self.__db.commit()
         except sqlite3.Error as e:
             print("Ошибка обновления технологии в БД: " + str(e))
@@ -113,18 +134,6 @@ class DataBase:
             return False
         return []
 
-    def updateNewImg(self, img, new_id):
-        if not img:
-            return False
-        try:
-            binary = sqlite3.Binary(img)
-            self.__cur.execute(
-                f"UPDATE news SET img = ? WHERE id = ?", (binary, new_id))
-            self.__db.commit()
-        except sqlite3.Error as e:
-            print("Ошибка обновления картинки в новости: "+str(e))
-            return False
-        return True
 
     def addUser(self, name, email, hpsw):
         try:
@@ -196,15 +205,3 @@ class DataBase:
             return False
         return ()
 
-    def getImageNewJSON(self, newId):
-        try:
-            self.__cur.execute(
-                f"SELECT img FROM news WHERE id = {newId} LIMIT 1")
-            res = self.__cur.fetchone()
-            if not res:
-                print("Запись не найдена")
-                return False
-            return dict(res)
-        except sqlite3.Error as e:
-            print(e)
-        return False

@@ -70,9 +70,25 @@
                     {% endfor %}
                 </div>
             </div>
-            <div class="about" id="news">
+
+            <div class="about" id="kirasib">
                 Новости
             </div>
+            
+            {% for post in res %}
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                <div class="col">
+                  <div class="card" style="width: 18rem;">
+                    <img src=".{{ post['img'] }}" class="card-img-top">
+                    <div class="card-body">
+                      <h5 class="card-title">Card title</h5>
+                      <p class="card-text">{{ post['content'] }}</p>
+                    </div>
+                  </div>
+                </div>
+            </div>
+            {% endfor %}
+
             <div class="about" id="kirasib">
                 Технологии
             </div>
