@@ -47,10 +47,6 @@
 			<div class="d-flex align-items-center">
 				<span class="me-3">Привет, {{user_name}}</span>
 				<a href="{{ url_for('index') }}" class="btn btn-outline-secondary me-4">Главная</a>
-				{% if is_admin == 1 %}
-				<a class="btn btn-outline-secondary me-4" href="{{url_for('register')}}">Добавить пользователя</a>
-				{% else %}
-				{% endif %}
 				<a class="btn btn-outline-secondary me-4" href="{{url_for('addTech')}}">Добавить технологию</a>
 				<a href="{{ url_for('logout') }}" class="btn btn-outline-secondary">Выход</a>
 			</div>

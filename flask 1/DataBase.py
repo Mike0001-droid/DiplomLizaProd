@@ -99,10 +99,20 @@ class DataBase:
             return False
         return True
     
-    def updateNew(self, content, img, id):
+    def updateNewAndImg(self, content, img, id):
         try:
             self.__cur.execute(
                 f"UPDATE news SET content=?, img=? WHERE id=?", (content, img, id))
+            self.__db.commit()
+        except sqlite3.Error as e:
+            print("Ошибка обновления технологии в БД: " + str(e))
+            return False
+        return True
+    
+    def updateNew(self, content, id):
+        try:
+            self.__cur.execute(
+                f"UPDATE news SET content=? WHERE id=?", (content,  id))
             self.__db.commit()
         except sqlite3.Error as e:
             print("Ошибка обновления технологии в БД: " + str(e))

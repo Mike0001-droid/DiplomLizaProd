@@ -48,11 +48,7 @@
 
                 <span class="me-3">Привет, {{user_name}}</span>
                 <a href="{{ url_for('index') }}" class="btn btn-outline-secondary me-4">Главная</a>
-                {% if is_admin == 1 %}
-                <a class="btn btn-outline-secondary me-4" href="{{url_for('register')}}">Добавить пользователя</a>
-                {% else %}
-                {% endif %}
-                <a class="btn btn-outline-secondary me-4" href="{{url_for('addPost')}}">Добавить статью</a>
+                <a class="btn btn-outline-secondary me-4" href="{{url_for('addNew')}}">Добавить новость</a>
                 <a href="{{ url_for('logout') }}" class="btn btn-outline-secondary">Выход</a>
             </div>
         </div>
@@ -118,6 +114,8 @@
                             <p><input type="file" name="img">
                                 <input class="form-control" type="hidden" name="id" value="{{ post['id'] }}">
                             <p><input type="submit" value="Загрузить">
+                            <p><button class="form-control color-primary btn btn-primary"
+								type="submit">Изменить</button>
                         </div>
                     </div>
                 </form>

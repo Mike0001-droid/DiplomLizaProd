@@ -57,6 +57,52 @@ def get_db():
     return g.link_db
 
 
+@app.route("/get_all_users")
+@login_required
+def get_all_users():
+    res = dbase.getAllUsers()
+    return render_template(
+        'all_users.html',
+        data=res,
+        user_name=current_user.get_name(),
+        is_admin=int(current_user.get_admin())
+    )
+
+
+@app.route('/register', methods=['POST', 'GET'])
+@login_required
+def register():
+    if request.method == "POST":
+        if request.form['psw'] == request.form['psw2']:
+            hash = generate_password_hash(request.form['psw'])
+            res = dbase.addUser(
+                request.form['name'], request.form['email'], hash)
+            if res:
+                return redirect(url_for('login'))
+    return render_template('register.html', is_admin=int(current_user.get_admin()))
+
+
+@app.route('/login', methods=['POST', 'GET'])
+def login():
+    if request.method == "POST":
+        user = dbase.getUserByEmail(request.form['email'])
+        if user and check_password_hash(user['psw'], request.form['psw']):
+            userLogin = UserLogin().create(user)
+            login_user(userLogin)
+            return redirect(url_for('post_admin'))
+
+        elif not user:
+            flash('Пользователь не найден', category='error')
+    return render_template("login.html", menu=dbase.getMenu())
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+
 @app.route("/")
 def index():
     path = url_for('static', filename='img/robot.jpg')
@@ -82,6 +128,52 @@ def index():
     )
 
 
+@app.route('/post_admin', methods=["POST", "GET"])
+@login_required
+def post_admin():
+    data = None
+    if int(current_user.get_admin()) == 1:
+        data = dbase.getJSON()
+        if request.method == "POST":
+            res = dbase.updateStatus(
+                request.form['title'], 
+                request.form['content'], 
+                request.form['status'], 
+                request.form['id']
+            )
+            return redirect(url_for('post_admin'))
+    else:
+        data = dbase.getUserPostsJSON(current_user.get_id())
+
+    res = dbase.getAllUsers()
+    return render_template(
+        "post_admin.html",
+        posts=data,
+        res=res,
+        user_name=current_user.get_name(),
+        is_admin=int(current_user.get_admin())
+    )
+
+
+@app.route("/add_post", methods=["POST", "GET"])
+@login_required
+def addPost():
+    if request.method == "POST":
+        res = None
+        if int(current_user.get_admin()) == 1:
+            res = dbase.addPost(
+                request.form['title'], request.form['content'], current_user.get_id(), 'public')
+        else:
+            res = dbase.addPost(
+                request.form['title'], request.form['content'], current_user.get_id(), 'draft')
+        if not res:
+            flash('Ошибка добавления статьи', category='error')
+        else:
+            flash('Статья добавлена успешно', category='success')
+            return redirect(url_for('post_admin'))
+    return render_template('add_post.html', menu=dbase.getMenu(), title="Добавление статьи")
+
+
 @app.route("/update_status", methods=["POST", "GET"])
 @login_required
 def updateStatus():
@@ -100,86 +192,6 @@ def updateStatus():
     else:
         tmp = 'error_admin.html'
     return render_template(tmp, menu=menu)
-
-
-@app.route("/add_post", methods=["POST", "GET"])
-@login_required
-def addPost():
-    if request.method == "POST":
-        res = None
-        if int(current_user.get_admin()) == 1:
-            res = dbase.addPost(
-                request.form['title'], request.form['content'], current_user.get_id(), 'public')
-        else:
-            res = dbase.addPost(
-                request.form['title'], request.form['content'], current_user.get_id(), 'draft')
-        if not res:
-            flash('Ошибка добавления статьи', category='error')
-        else:
-            flash('Статья добавлена успешно', category='success')
-    return render_template('add_post.html', menu=dbase.getMenu(), title="Добавление статьи")
-
-
-@app.route('/register', methods=['POST', 'GET'])
-@login_required
-def register():
-    if request.method == "POST":
-        if request.form['psw'] == request.form['psw2']:
-            hash = generate_password_hash(request.form['psw'])
-            res = dbase.addUser(
-                request.form['name'], request.form['email'], hash)
-            if res:
-                return redirect(url_for('login'))
-    return render_template('register.html', is_admin=int(current_user.get_admin()))
-
-
-@app.route('/login', methods=['POST', 'GET'])
-def login():
-    if request.method == "POST":
-        user = dbase.getUserByEmail(request.form['email'])
-        if user and check_password_hash(user['psw'], request.form['psw']):
-            userLogin = UserLogin().create(user)
-            login_user(userLogin)
-            return redirect(url_for('profile'))
-
-        elif not user:
-            flash('Пользователь не найден', category='error')
-    return render_template("login.html", menu=dbase.getMenu())
-
-
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for('index'))
-
-
-@app.route('/post_admin', methods=["POST", "GET"])
-@login_required
-def post_admin():
-    data = None
-    if int(current_user.get_admin()) == 1:
-        data = dbase.getJSON()
-        if request.method == "POST":
-            res = dbase.updateStatus(
-                request.form['title'], 
-                request.form['content'], 
-                request.form['status'], 
-                request.form['id']
-            )
-            return redirect(url_for('post_admin'))
-            
-    else:
-        data = dbase.getUserPostsJSON(current_user.get_id())
-
-    res = dbase.getAllUsers()
-    return render_template(
-        "post_admin.html",
-        posts=data,
-        res=res,
-        user_name=current_user.get_name(),
-        is_admin=int(current_user.get_admin())
-    )
 
 
 @app.route("/tech_admin", methods=["POST", "GET"])
@@ -206,14 +218,27 @@ def addTech():
     if request.method == "POST":
         res = None
         if int(current_user.get_admin()) == 1:
-            res = dbase.addTech(
-                request.form['summary'], request.form['content'])
+            res = dbase.addTech(request.form['summary'], request.form['content'])     
         if not res:
             flash('Ошибка добавления статьи', category='error')
         else:
             flash('Статья добавлена успешно', category='success')
+            return redirect(url_for('tech_admin')) 
     return render_template('add_tech.html', menu=dbase.getMenu(), title="Добавление статьи")
 
+
+@app.route("/news_admin", methods=['GET'])
+@login_required
+def news_admin():
+    if int(current_user.get_admin()) == 1:
+        res = dbase.getNewsJSON()
+        return render_template(
+            "news_admin.html", 
+            posts=res,
+            user_name=current_user.get_name(),
+            is_admin=int(current_user.get_admin())
+        )
+    
 
 @app.route("/add_new", methods=["POST", "GET"])
 @login_required
@@ -233,19 +258,8 @@ def addNew():
             flash('Ошибка добавления статьи', category='error')
         else:
             flash('Статья добавлена успешно', category='success')
+            return redirect(url_for('news_admin')) 
     return render_template('add_new.html')
-
-
-@app.route("/get_all_users")
-@login_required
-def get_all_users():
-    res = dbase.getAllUsers()
-    return render_template(
-        'all_users.html',
-        data=res,
-        user_name=current_user.get_name(),
-        is_admin=int(current_user.get_admin())
-    )
 
 
 @app.route("/updateNew", methods=['POST'])
@@ -254,6 +268,7 @@ def updateNew():
     if int(current_user.get_admin()) == 1:
         new_id = request.form['id']
         content = request.form['content']
+        print(content)
         file = request.files['img']
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
@@ -261,22 +276,10 @@ def updateNew():
             imgpath = "/static/img/"+filename
             file.save(save_path)
         if file:
-            dbase.updateNew(content, imgpath, new_id)
-        return redirect(url_for('index'))
-
-
-@app.route("/news_admin", methods=['GET'])
-@login_required
-def news_admin():
-    if int(current_user.get_admin()) == 1:
-        res = dbase.getNewsJSON()
-        
-        return render_template(
-            "news_admin.html", 
-            posts=res,
-            user_name=current_user.get_name(),
-            is_admin=int(current_user.get_admin())
-        )
+            dbase.updateNewAndImg(content, imgpath, new_id)
+        else:
+            dbase.updateNew(content, new_id)
+        return redirect(url_for('news_admin'))
 
 
 if __name__ == "__main__":

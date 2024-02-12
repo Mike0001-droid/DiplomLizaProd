@@ -74,20 +74,21 @@
             <div class="about" id="kirasib">
                 Новости
             </div>
-            
+            <div class="row row-cols-1 row-cols-md-3">
             {% for post in res %}
-            <div class="row row-cols-1 row-cols-md-3 g-4">
-                <div class="col">
-                  <div class="card" style="width: 18rem;">
-                    <img src=".{{ post['img'] }}" class="card-img-top">
-                    <div class="card-body">
-                      <h5 class="card-title">Card title</h5>
-                      <p class="card-text">{{ post['content'] }}</p>
+            <div class="p-5 col-6">
+                <div class="cardContent w-100">
+                    <div class="card__frame">
+                        <h5 class="card-title">Card title</h5>
+                        <p class="card-description">{{ post['content'] }}</p>
                     </div>
-                  </div>
+                    <div class="card__cover">
+                        <img src=".{{ post['img'] }}" class="card-img-top">
+                    </div>
                 </div>
             </div>
             {% endfor %}
+        </div>
 
             <div class="about" id="kirasib">
                 Технологии

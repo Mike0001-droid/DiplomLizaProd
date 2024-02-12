@@ -245,3 +245,37 @@ form-inner {
     border: 1px solid #ff4343;
     background: #FF9C9C;
 }
+
+.cardContent{
+    width: 24%;
+    position: relative;
+    box-sizing: border-box;
+    padding: 0;
+    height: 100%;
+
+}
+.card__frame{
+    position: absolute; 
+    top: -30px;
+    left: -30px;
+    right: 40px;
+    background: #b6b6b6e8;
+    padding: 20px;
+    border-radius: 20px;
+}
+.card__cover{
+    width: 100%;
+    border-radius: 20px;
+    overflow: hidden;
+    height: 100%;
+}
+.card__cover > img{
+    width: 100%;
+    margin: 0;
+    float:none;
+    height: 100%;
+}
+.card-description{
+    margin-top: 20px;
+    padding: 0 !important;
+}
