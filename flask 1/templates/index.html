@@ -123,15 +123,13 @@
             <div class="Im2">
                 <img src="{{ path2 }}">
             </div>
-            <form class="form__feedback" action="{{ path3 }}" method="post" id="form__feedback">
+            <form class="form__feedback" action="{{ url_for('send_mail') }}" method="post" id="form__feedback">
                 <h3 class="form__feedback--h">Написать нам</h3>
                 <input class="form__feedback--input" type="text" name="name" placeholder="Имя" required>
                 <input class="form__feedback--input" type="email" name="email" placeholder="Email" required>
                 <textarea class="form__feedback--input" name="text" id="" rows="2"
                           placeholder="Введите текст"></textarea>
-                <button type="button" class="form__feedback--btn">Отправить форму</button>
-                <div class="status"></div>
-
+                <button type="submit" class="form__feedback--btn">Отправить форму</button>
             </form>
         </div>
     </div>

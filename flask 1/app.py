@@ -6,7 +6,7 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from UserLogin import UserLogin
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-
+from flask_mail import Mail, Message
 
 DATABASE = '/tmp/database.db'
 DEBUG = True
@@ -17,6 +17,15 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 app.config.update(dict(DATABASE=os.path.join(app.root_path, 'database.db')))
 path_to_save_images = os.path.join(app.root_path, 'static', 'img')
+app.config['MAIL_SERVER'] = 'smtp.mail.ru'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = 'majorov-2004@list.ru'
+app.config['MAIL_PASSWORD'] = 'g425t0qxsRm3vqC2ZFbP'
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+mail = Mail(app)
+
+
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -55,7 +64,6 @@ def get_db():
     if not hasattr(g, 'link_db'):
         g.link_db = connect_db()
     return g.link_db
-
 
 @app.route("/get_all_users")
 @login_required
@@ -126,6 +134,15 @@ def index():
         auth_user=str(current_user.is_authenticated),
         is_admin=is_admin
     )
+
+@app.route('/send_mail', methods=['GET', 'POST'])
+def send_mail():
+    if request.method == 'POST':
+        msg = Message("Связь", sender='majorov-2004@list.ru', recipients=[request.form['email']])
+        msg.body = request.form['text']
+        mail.send(msg)
+        return 'Сообщение отправлено!'
+    return render_template('mail.html')
 
 
 @app.route('/post_admin', methods=["POST", "GET"])
