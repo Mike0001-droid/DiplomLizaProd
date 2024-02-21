@@ -82,7 +82,7 @@ def get_all_users():
 def register():
     if request.method == "POST":
         if request.form['psw'] == request.form['psw2']:
-            hash = generate_password_hash(request.form['psw'])
+            hash = request.form['psw']
             res = dbase.addUser(
                 request.form['name'], request.form['email'], hash)
             if res:
@@ -94,7 +94,7 @@ def register():
 def login():
     if request.method == "POST":
         user = dbase.getUserByEmail(request.form['email'])
-        if user and check_password_hash(user['psw'], request.form['psw']):
+        if user and (user['psw'] == request.form['psw']):
             userLogin = UserLogin().create(user)
             login_user(userLogin)
             return redirect(url_for('post_admin'))
@@ -143,6 +143,11 @@ def send_mail():
         mail.send(msg)
         return 'Сообщение отправлено!'
     return render_template('mail.html')
+
+@app.route('/del_user', methods=['GET', 'POST'])
+def del_user():
+    dbase.delUser(request.form['id'])
+    return render_template('all_users.html')
 
 
 @app.route('/post_admin', methods=["POST", "GET"])
@@ -301,11 +306,3 @@ def updateNew():
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-""" 
-4) Обратный запрос 
-
-5) Адаптив
-6) Деплой 
-
-"""

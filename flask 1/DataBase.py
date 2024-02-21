@@ -160,7 +160,13 @@ class DataBase:
             print("Ошибка добавления пользователя в БД "+str(e))
             return False
         return True
-
+    
+    def delUser(self, user_id):
+        self.__cur.execute(
+                f"DELETE FROM users WHERE id = {user_id}")
+        self.__db.commit()
+        return True
+      
     def getUser(self, user_id):
         try:
             self.__cur.execute(
@@ -182,7 +188,6 @@ class DataBase:
             if not res:
                 print("Пользователь не найден")
                 return False
-
             return res
         except sqlite3.Error as e:
             print("Ошибка получения данных из БД "+str(e))
@@ -211,7 +216,6 @@ class DataBase:
                 blocks_list = [dict(ix) for ix in res]
                 return blocks_list
         except sqlite3.Error as e:
-            print(e)
             return False
         return ()
 
