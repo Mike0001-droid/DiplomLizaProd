@@ -101,9 +101,12 @@
 							<h5 class="card-title">Имя: {{user['name']}}</h5>
 							<h5 class="card-title">Почта: {{user['email']}}</h5>
 							<h5 class="card-title">Пароль: {{user['psw']}}</h5>
-							<a href="{{url_for('del_user')}}">
-								<h5 class="card-title">Удалить пользователя</h5>
-							</a>
+							<input class="form-control" type="hidden" name="id" value="{{ user['id'] }}">
+							<a class="nav-link active" aria-current="page" href="{{url_for('update_user', pk=user['id'])}}">
+                                <span data-feather="home"></span>
+                                Изменить данные
+                            </a>
+						
 						</div>
 					</div>
 					{% endfor %}

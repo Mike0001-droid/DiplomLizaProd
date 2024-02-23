@@ -88,6 +88,16 @@ class DataBase:
             print("Ошибка добавления статьи в БД: " + str(e))
             return False
         return True
+    
+    def updateUser(self, name, email, psw, id):
+        try:
+            self.__cur.execute(
+                f"UPDATE users SET name=?, email=?, psw=? WHERE id=?", (name, email, psw, id))
+            self.__db.commit()
+        except sqlite3.Error as e:
+            print("Ошибка добавления статьи в БД: " + str(e))
+            return False
+        return True
 
     def updateTechn(self, title, content, id):
         try:

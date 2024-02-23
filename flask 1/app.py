@@ -82,11 +82,10 @@ def get_all_users():
 def register():
     if request.method == "POST":
         if request.form['psw'] == request.form['psw2']:
-            hash = request.form['psw']
             res = dbase.addUser(
-                request.form['name'], request.form['email'], hash)
+                request.form['name'], request.form['email'], request.form['psw'])
             if res:
-                return redirect(url_for('login'))
+                return redirect(url_for('get_all_users'))
     return render_template('register.html', is_admin=int(current_user.get_admin()))
 
 
@@ -138,16 +137,10 @@ def index():
 @app.route('/send_mail', methods=['GET', 'POST'])
 def send_mail():
     if request.method == 'POST':
-        msg = Message("Связь", sender='majorov-2004@list.ru', recipients=[request.form['email']])
+        msg = Message("Обратная связь", sender='majorov-2004@list.ru', recipients=[request.form['email']])
         msg.body = request.form['text']
         mail.send(msg)
-        return 'Сообщение отправлено!'
     return render_template('mail.html')
-
-@app.route('/del_user', methods=['GET', 'POST'])
-def del_user():
-    dbase.delUser(request.form['id'])
-    return render_template('all_users.html')
 
 
 @app.route('/post_admin', methods=["POST", "GET"])
@@ -261,6 +254,31 @@ def news_admin():
             is_admin=int(current_user.get_admin())
         )
     
+@app.route("/update_user/<int:pk>", methods=["POST", "GET"])
+def update_user(pk):
+    if request.method == "POST":
+        res = dbase.updateUser(
+            request.form['name'],
+            request.form['email'],
+            request.form['psw'],
+            pk
+        )
+        if not res:
+            flash('Ошибка добавления статьи', category='error')
+        else:
+            flash('Статья добавлена успешно', category='success')
+        return redirect(url_for('get_all_users'))
+    return render_template(
+            'update_user.html',
+            post = dbase.getUser(pk),
+            is_admin=int(current_user.get_admin())
+        )
+
+@app.route("/del_user/<int:pk>", methods=['GET'])
+def del_user(pk):
+    res = dbase.delUser(pk)
+    return redirect(url_for('get_all_users')) 
+
 
 @app.route("/add_new", methods=["POST", "GET"])
 @login_required
@@ -306,3 +324,11 @@ def updateNew():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+""" 
+4) Обратный запрос 
+
+5) Адаптив
+6) Деплой 
+
+"""
